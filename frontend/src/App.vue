@@ -30,7 +30,7 @@ function showToast(message, type = "info") {
 // Check API status
 async function checkAPIStatus() {
   try {
-    const res = await fetch(`${API_URL}/`, { method: "HEAD" });
+    const res = await fetch(`${API_URL}/api/attendance?range=all`);
     const wasOffline = !isOnline.value;
     isOnline.value = res.ok;
 
@@ -47,6 +47,7 @@ async function checkAPIStatus() {
     }
   }
 }
+
 
 onMounted(() => {
   loadFromAPI();
