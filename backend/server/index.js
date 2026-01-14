@@ -1,6 +1,6 @@
 import express from "express";
 import cors from "cors";
-import { pool, testConnection } from "./db.pg.js";
+import pool, { testConnection } from "./db.pg.js";
 import { isDemoMode, toggleDemoMode, getDemoStatus, initDemoModeFromDB } from "./demoMode.js";
 
 const app = express();
