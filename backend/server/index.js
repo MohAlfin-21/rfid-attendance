@@ -6,7 +6,14 @@ import { isDemoMode, toggleDemoMode, getDemoStatus, initDemoModeFromDB } from ".
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(
+  cors({
+    origin: ["https://rfid-attendance.vercel.app", "https://rfid-attendance-production-4b99.up.railway.app", "http://localhost:5173"],
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
+
 app.use(express.json());
 
 app.get("/", (req, res) => {
@@ -20,7 +27,7 @@ app.put("/api/demoMode", async (req, res) => {
     await pool.query("UPDATE system_settings SET value = $1 WHERE key = 'demo_mode'", [mode.toString()]);
     res.json({ demoMode: mode });
   } catch (error) {
-    console.error('Error toggling demo mode:', error);
+    console.error("Error toggling demo mode:", error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -48,7 +55,7 @@ app.post("/api/attendance", async (req, res) => {
 
     res.json({ success: true, name: student.rows[0].name, status });
   } catch (error) {
-    console.error('Error recording attendance:', error);
+    console.error("Error recording attendance:", error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -85,7 +92,7 @@ app.get("/api/attendance", async (req, res) => {
 
     res.json(result.rows);
   } catch (error) {
-    console.error('Error fetching attendance:', error);
+    console.error("Error fetching attendance:", error);
     res.status(500).json({ error: error.message });
   }
 });
@@ -97,7 +104,7 @@ async function initSystemSettings() {
     initDemoModeFromDB(res.rows[0]?.value ?? "false");
     console.log("✅ Demo mode initialized");
   } catch (error) {
-    console.error('❌ Error initializing system settings:', error.message);
+    console.error("❌ Error initializing system settings:", error.message);
     throw error;
   }
 }
@@ -105,29 +112,29 @@ async function initSystemSettings() {
 async function start() {
   try {
     // Test koneksi database dulu
-    console.log('🔍 Testing PostgreSQL connection...');
+    console.log("🔍 Testing PostgreSQL connection...");
     const connected = await testConnection();
-    
+
     if (!connected) {
-      console.error('\n⚠️  GAGAL KONEKSI KE DATABASE!');
-      console.error('Pastikan:');
-      console.error('1. PostgreSQL sudah running');
+      console.error("\n⚠️  GAGAL KONEKSI KE DATABASE!");
+      console.error("Pastikan:");
+      console.error("1. PostgreSQL sudah running");
       console.error('2. Database "rfid_attendance" sudah dibuat');
-      console.error('3. User dan password di .env sudah benar');
-      console.error('4. Tabel sudah di-create (jalankan SQL schema)');
+      console.error("3. User dan password di .env sudah benar");
+      console.error("4. Tabel sudah di-create (jalankan SQL schema)");
       process.exit(1);
     }
 
     // Initialize system settings
     await initSystemSettings();
-    
+
     // Start server
     app.listen(PORT, () => {
       console.log(`\n🚀 API PostgreSQL running on port ${PORT}`);
       console.log(`📍 http://localhost:${PORT}`);
     });
   } catch (error) {
-    console.error('❌ Failed to start server:', error.message);
+    console.error("❌ Failed to start server:", error.message);
     process.exit(1);
   }
 }
