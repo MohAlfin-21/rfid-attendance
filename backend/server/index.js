@@ -8,12 +8,12 @@ const PORT = process.env.PORT || 3000;
 
 app.use(
   cors({
-    origin: ["https://rfid-attendance.vercel.app", "https://rfid-attendance-production-4b99.up.railway.app", "http://localhost:5173"],
+    origin: true, // ⬅️ PENTING
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true,
   })
 );
+
 
 app.use(express.json());
 
