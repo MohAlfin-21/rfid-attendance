@@ -1,5 +1,5 @@
-import express from "express";
 import cors from "cors";
+import express from "express";
 import pool, { testConnection } from "./db.pg.js";
 import { isDemoMode, toggleDemoMode, getDemoStatus, initDemoModeFromDB } from "./demoMode.js";
 
@@ -8,14 +8,10 @@ const PORT = process.env.PORT || 3000;
 
 app.use(
   cors({
-    origin: [
-      "https://rfid-attendance.vercel.app",
-      "https://rfid-attendance-production-4b99.up.railway.app",
-      "http://localhost:5173"
-    ],
+    origin: ["https://rfid-attendance.vercel.app", "https://rfid-attendance-production-4b99.up.railway.app", "http://localhost:5173"],
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-    credentials: true
+    credentials: true,
   })
 );
 
