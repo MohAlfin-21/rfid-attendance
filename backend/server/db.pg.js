@@ -2,20 +2,39 @@ import pkg from "pg";
 const { Pool } = pkg;
 
 // Pool configuration dengan timeout dan retry
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  ssl: {
-    rejectUnauthorized: false,
-  },
-  // Tambahan config untuk Railway
-  connectionTimeoutMillis: 10000, // 10 detik
-  idleTimeoutMillis: 30000, // 30 detik
-  max: 20, // maksimal 20 koneksi
-  min: 2, // minimal 2 koneksi idle
-  // Ini PENTING untuk Railway
+const poolConfig = {
+  connectionTimeoutMillis: 10000,
+  idleTimeoutMillis: 30000,
+  max: 20,
+  min: 2,
   keepAlive: true,
   keepAliveInitialDelayMillis: 10000,
-});
+};
+
+// Railway PostgreSQL butuh SSL tapi kadang tidak support
+// Coba dulu dengan SSL, kalau gagal tanpa SSL
+let pool;
+
+if (process.env.DATABASE_URL) {
+  // Gunakan DATABASE_URL
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ...poolConfig,
+    // SSL optional - Railway sometimes doesn't require it
+    ssl: process.env.DATABASE_URL.includes("sslmode=require") ? { rejectUnauthorized: false } : false,
+  });
+} else {
+  // Fallback ke individual env vars
+  pool = new Pool({
+    host: process.env.PG_HOST,
+    port: process.env.PG_PORT,
+    user: process.env.PG_USER,
+    password: process.env.PG_PASSWORD,
+    database: process.env.PG_DB,
+    ...poolConfig,
+    ssl: false, // Local development biasanya tanpa SSL
+  });
+}
 
 // Error handler global
 pool.on("error", (err) => {
